@@ -63,7 +63,7 @@ export async function POST(req: Request, res: Response) {
     } else {
       console.error("elle gpt error", error);
       return NextResponse.json(
-        { error: "An unexpected error occurred." },
+        { error: "Chat GPT error." },
         {
           status: 500,
         }

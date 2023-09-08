@@ -106,8 +106,9 @@ export async function POST(req: Request, res: Response) {
         }
       );
     } else {
+      console.error("Error generated game", error);
       return NextResponse.json(
-        { error: "An unexpected error occurred." },
+        { error: "Error generated game" },
         {
           status: 500,
         }
