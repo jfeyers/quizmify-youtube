@@ -16,7 +16,7 @@ import { z } from "zod";
 import axios from "axios";
 import { useToast } from "./ui/use-toast";
 import Link from "next/link";
-import { checkAnswerSchema } from "@/schemas/forms/quiz";
+import { checkAnswerSchema, endGameSchema } from "@/schemas/question";
 import keyword_extractor from "keyword-extractor";
 
 type Props = {
@@ -39,8 +39,9 @@ const OpenEnded = ({ game }: Props) => {
     mutationFn: async () => {
       let filledAnswer = blankAnswer;
       document.querySelectorAll("#user-blank-input").forEach((input) => {
-        filledAnswer = filledAnswer.replace("_____", input.value);
-        input.value = "";
+        const inputConverted = input as HTMLInputElement;
+        filledAnswer = filledAnswer.replace("_____", inputConverted.value);
+        inputConverted.value = "";
       });
       const payload: z.infer<typeof checkAnswerSchema> = {
         questionId: currentQuestion.id,
@@ -59,9 +60,21 @@ const OpenEnded = ({ game }: Props) => {
       return () => clearInterval(interval);
     }
   }, [hasEnded]);
+
   const handleSetBlankAnswer = (answer: string) => {
     setBlankAnswer(answer);
   };
+
+  const { mutate: endGame } = useMutation({
+    mutationFn: async () => {
+      const payload: z.infer<typeof endGameSchema> = {
+        gameId: game.id,
+      };
+      const response = await axios.post(`/api/endGame`, payload);
+      return response.data;
+    },
+  });
+
   const handleNext = React.useCallback(() => {
     checkAnswer(undefined, {
       onSuccess: ({ percentageSimilar }) => {
@@ -73,6 +86,7 @@ const OpenEnded = ({ game }: Props) => {
           return (prev + percentageSimilar) / (questionIndex + 1);
         });
         if (questionIndex === game.questions.length - 1) {
+          endGame();
           setHasEnded(true);
           return;
         }
@@ -86,7 +100,8 @@ const OpenEnded = ({ game }: Props) => {
         });
       },
     });
-  }, [checkAnswer, questionIndex, toast, game.questions.length]);
+  }, [checkAnswer, questionIndex, toast, game.questions.length, endGame]);
+
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key;
@@ -99,6 +114,7 @@ const OpenEnded = ({ game }: Props) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleNext]);
+
   const keywords = React.useMemo(() => {
     const words = keyword_extractor.extract(currentQuestion.answer, {
       language: "english",
