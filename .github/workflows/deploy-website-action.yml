@@ -1,0 +1,10 @@
+name: Deploy Quizmify to Vercel
+on: workflow_dispatch
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print greeting
+        run: echo "Hello World!"
+      - name: Print greeting
+        run: echo "Done Bye!"
