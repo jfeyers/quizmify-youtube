@@ -11,10 +11,6 @@ export const metadata = {
   title: "Dashboard | Quizmify",
 };
 const Dashboard = async (props: Props) => {
-  const session = await getAuthSession();
-  if (!session?.user) {
-    return redirect("/");
-  }
   return (
     <main className="p-8 mx-auto max-w-7x1">
       <div className="flex items-center">
