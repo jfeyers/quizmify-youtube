@@ -1,5 +1,4 @@
 "use client";
-
 import { SessionProvider } from "next-auth/react";
 import React from "react";
 import {
@@ -20,7 +19,7 @@ const Providers = ({ children, ...props }: ThemeProviderProps) => {
         enableSystem
         {...props}
       >
-        <SessionProvider>{children}</SessionProvider>
+        {children}
       </NextThemesProvider>
     </QueryClientProvider>
   );
